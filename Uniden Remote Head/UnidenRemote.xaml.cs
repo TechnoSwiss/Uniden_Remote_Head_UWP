@@ -240,12 +240,14 @@ namespace Uniden_Remote_Head
                 SendNow("VOL," + scannerSettings.Scanner.volume.ToString());
                 scannerSettings.Scanner.mute = false;
                 UpdateSettings = true;
+                btnMute.BorderBrush = new SolidColorBrush(Colors.DimGray);
             }
             else
             {
                 SendNow("VOL,0");
                 scannerSettings.Scanner.mute = true;
                 UpdateSettings = true;
+                btnMute.BorderBrush = new SolidColorBrush(Colors.Red);
             }
         }
 
@@ -891,6 +893,32 @@ namespace Uniden_Remote_Head
                 {
                     try
                     {
+                        if (!connected)  // if we're not connected, none of this is going to work, so there's no point in trying it yet. Lets give a different message though.
+                        {
+                            await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
+                            {
+                                string temp = "";
+                                switch (tbLine3.Text.Length)
+                                {
+                                    case (15):
+                                        temp = "Searching BT.";
+                                        break;
+                                    case (13):
+                                        temp = "Searching BT..";
+                                        break;
+                                    case (14):
+                                        temp = "Searching BT...";
+                                        break;
+                                    default:
+                                        temp = "Searching BT.";
+                                        break;
+                                }
+                                tbLine3.Text = temp;
+                            });
+
+                            return;
+                        }
+
                         if (UpdateSettings)
                         {
                             UpdateSettingsCommunications();
@@ -910,10 +938,12 @@ namespace Uniden_Remote_Head
                             if (scannerSettings.Scanner.mute)
                             {
                                 SendNow("VOL,0");
+                                btnMute.BorderBrush = new SolidColorBrush(Colors.Red);
                             }
                             else
                             {
                                 SendNow("VOL," + scannerSettings.Scanner.volume.ToString());
+                                btnMute.BorderBrush = new SolidColorBrush(Colors.DimGray);
                             }
                             scannerStateKnown = true;
                         }

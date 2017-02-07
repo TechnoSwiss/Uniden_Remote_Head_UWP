@@ -53,7 +53,7 @@
                         <Slider x:Name="sldrRed" Header="Red" Width="200" Maximum="255" ValueChanged="sldrChange"/>
                         <Slider x:Name="sldrGreen" Header="Green" Width="200" Maximum="255" ValueChanged="sldrChange"/>
                         <Slider x:Name="sldrBlue" Header="Blue" Width="200" Maximum="255" ValueChanged="sldrChange"/>
-                        
+
                     </StackPanel>
                 </ScrollViewer>
             </SplitView.Pane>
@@ -63,18 +63,23 @@
                         <Button x:Name="btnHamburgerContent" FontFamily="Segoe MDL2 Assets" Content="&#xE700;"
                         Width="40" Height="40" Background="Transparent" Foreground="{x:Bind Path=btnFunction.Foreground, Mode=OneWay}" Click="btnHamburger_Click"/>
                         <StackPanel BorderThickness="3">
-                            <TextBlock Name="tbLine1" Width="351" Height="24"
+                            <Grid>
+                                <StackPanel>
+                                    <TextBlock Name="tbLine1" Width="351" Height="24"
                                     FontSize="20" Foreground="{x:Bind Path=btnFunction.Foreground, Mode=OneWay}" FontFamily="Consolas" />
-                            <TextBlock Name="tbLine2" Width="351" Height="48"
+                                    <TextBlock Name="tbLine2" Width="351" Height="48"
                                     FontSize="40" Foreground="{x:Bind Path=btnFunction.Foreground, Mode=OneWay}" FontFamily="Consolas" />
-                            <TextBlock Name="tbLine3" Width="351" Height="48"
+                                    <TextBlock Name="tbLine3" Width="351" Height="48"
                                     FontSize="40" Foreground="{x:Bind Path=btnFunction.Foreground, Mode=OneWay}" FontFamily="Consolas" />
-                            <TextBlock Name="tbLine4" Width="351" Height="24"
+                                    <TextBlock Name="tbLine4" Width="351" Height="24"
                                     FontSize="20" Foreground="{x:Bind Path=btnFunction.Foreground, Mode=OneWay}" FontFamily="Consolas" />
-                            <TextBlock Name="tbLine5" Width="351" Height="24"
+                                    <TextBlock Name="tbLine5" Width="351" Height="24"
                                     FontSize="20" Foreground="{x:Bind Path=btnFunction.Foreground, Mode=OneWay}" FontFamily="Consolas" />
-                            <TextBlock Name="tbLine6" Width="351" Height="24"
+                                    <TextBlock Name="tbLine6" Width="351" Height="24"
                                     FontSize="20" Foreground="{x:Bind Path=btnFunction.Foreground, Mode=OneWay}" FontFamily="Consolas" />
+                                </StackPanel>
+                                <Button x:Name="btnMuteLarge" Width="351" Height="185" Click="btnMute_Click" Opacity="0"/>
+                            </Grid>
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="20*"/>
