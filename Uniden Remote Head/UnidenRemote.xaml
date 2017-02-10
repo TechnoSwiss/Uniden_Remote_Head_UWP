@@ -17,30 +17,9 @@
                     <StackPanel Background="DimGray">
                         <Button x:Name="btnHamburgerPane" FontFamily="Segoe MDL2 Assets" Content="&#xE700;"
                                 Width="40" Height="40" Background="Transparent" Foreground="White" Click="btnHamburger_Click"/>
-                        <Button Name="btnConnect"
-                                Content="Connect"
-                                Click="btnConnect_Click" 
-                                FontSize="20" Foreground="White" Background="DarkGray" />
-                        <Button Name="btnDisconnect" 
-                                Content="Disconnect" 
-                                Click="btnDisconnect_Click" 
-                                FontSize="20" Foreground="White" Background="DarkGray" />
-                        <TextBox Name="tbInput" 
-                                 Text="KEY,V,P" 
-                                 FontSize="20" Foreground="White" />
-                        <Button Name="btnSend" 
-                                Content="Send" 
-                                Click="btnSend_Click" 
-                                FontSize="20" Foreground="White" Background="DarkGray" />
-                        <TextBlock Name="tbError"
-                                FontSize="20" Foreground="White" />
-                        <Button Name="btnReceive" 
-                                Content="Receive" 
-                                Click="btnReceive_Click" 
-                                FontSize="20" Foreground="White" Background="DarkGray" />
                         <TextBlock Name="tbBatStatus"
                                 FontSize="15" Foreground="White" />
-                        <TextBlock Name="tbBatPercent"
+                        <!--<TextBlock Name="tbBatPercent"
                                 FontSize="15" Foreground="White" />
                         <TextBlock Name="tbBatMaxCap"
                                 FontSize="15" Foreground="White" />
@@ -49,11 +28,77 @@
                         <TextBlock Name="tbBatRemainCap"
                                 FontSize="15" Foreground="White" />
                         <TextBlock Name="tbBatChargeRate"
-                                FontSize="15" Foreground="White" />
-                        <Slider x:Name="sldrRed" Header="Red" Width="200" Maximum="255" ValueChanged="sldrChange"/>
-                        <Slider x:Name="sldrGreen" Header="Green" Width="200" Maximum="255" ValueChanged="sldrChange"/>
-                        <Slider x:Name="sldrBlue" Header="Blue" Width="200" Maximum="255" ValueChanged="sldrChange"/>
-
+                                FontSize="15" Foreground="White" />-->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="10*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="10*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="10*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Name="btnConnect" Grid.Column="1"
+                                Content="Connect"
+                                Click="btnConnect_Click" 
+                                FontSize="20" Foreground="White" Background="DarkGray" />
+                            <Button Name="btnDisconnect" Grid.Column="3"
+                                Content="Disconnect" 
+                                Click="btnDisconnect_Click" 
+                                FontSize="20" Foreground="White" Background="DarkGray" />
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="10*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Name="tbInput" Grid.Column="0"
+                                 Text="KEY,V,P" 
+                                 FontSize="20" Foreground="White" />
+                            <Button Name="btnSend" Grid.Column="1"
+                                Content="Send" 
+                                Click="btnSend_Click" 
+                                FontSize="20" Foreground="White" Background="DarkGray" />
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="10*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="10*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Name="btnReceive" Grid.Column="1"
+                                Content="Receive" 
+                                Click="btnReceive_Click" 
+                                FontSize="20" Foreground="White" Background="DarkGray" />
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Red" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                            <Slider x:Name="sldrRed" Grid.Column="1" Grid.Row="0" Width="200" Maximum="255" ValueChanged="sldrChange"/>
+                            <TextBlock Text="Green" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                            <Slider x:Name="sldrGreen" Grid.Column="1" Grid.Row="1" Width="200" Maximum="255" ValueChanged="sldrChange"/>
+                            <TextBlock Text="Blue" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                            <Slider x:Name="sldrBlue" Grid.Column="1" Grid.Row="2" Width="200" Maximum="255" ValueChanged="sldrChange"/>
+                        </Grid>
+                        <TextBlock Name="tbError"
+                            TextWrapping="Wrap"
+                            FontSize="20" Foreground="White" Height="55" Canvas.ZIndex="-3" />
+                        <TextBlock Name="tbError2"
+                            TextWrapping="Wrap"
+                            FontSize="20" Foreground="White" Height="55" Canvas.ZIndex="-3" />
+                        <TextBlock Name="tbError3"
+                            TextWrapping="Wrap"
+                            FontSize="20" Foreground="White" Height="55" Canvas.ZIndex="-3" />
+                        <TextBlock Name="tbError4"
+                            TextWrapping="Wrap"
+                            FontSize="20" Foreground="White" Height="55" Canvas.ZIndex="-3" />
                     </StackPanel>
                 </ScrollViewer>
             </SplitView.Pane>
@@ -78,7 +123,14 @@
                                     <TextBlock Name="tbLine6" Width="351" Height="24"
                                     FontSize="20" Foreground="{x:Bind Path=btnFunction.Foreground, Mode=OneWay}" FontFamily="Consolas" />
                                 </StackPanel>
-                                <Button x:Name="btnMuteLarge" Width="351" Height="185" Click="btnMute_Click" Opacity="0"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="20*"/>
+                                        <ColumnDefinition Width="20*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button x:Name="btnMuteLarge" Grid.Column="0" Width="175" Height="185" Click="btnMute_Click" Opacity="0"/>
+                                    <Button x:Name="btnHoldLarge" Grid.Column="1" Width="175" Height="185" Click="btnHold_Click" Opacity="0"/>
+                                </Grid>
                             </Grid>
                             <Grid>
                                 <Grid.ColumnDefinitions>

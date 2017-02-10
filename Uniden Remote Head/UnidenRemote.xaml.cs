@@ -292,7 +292,7 @@ namespace Uniden_Remote_Head
 
         private void btnFunction_Click(object sender, RoutedEventArgs e)
         {
-            if(!cancelFuncClick)
+            if (!cancelFuncClick)
             {
                 SendNow("KEY,F,P");
             }
@@ -432,10 +432,7 @@ namespace Uniden_Remote_Head
             }
             catch (Exception ex)
             {
-                await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
-                {
-                    tbError.Text = ex.Message;
-                });
+                await ErrorMessage(ex.Message);
                 if (writer != null)
                 {
                     writer.DetachStream();
@@ -445,7 +442,7 @@ namespace Uniden_Remote_Head
 
         private async Task<uint> Send(string msg)
         {
-            tbError.Text = string.Empty;
+            await ErrorMessage(string.Empty);
 
             DataWriter writer = null;
 
@@ -468,7 +465,7 @@ namespace Uniden_Remote_Head
             }
             catch (Exception ex)
             {
-                tbError.Text = ex.Message;
+                await ErrorMessage(ex.Message);
 
                 if (writer != null)
                 {
@@ -482,12 +479,9 @@ namespace Uniden_Remote_Head
         private async void Receive()
         {
             // we want to make sure only 1 receive thread is running
-            if(receiveDataThreads > 0)
+            if (receiveDataThreads > 0)
             {
-                await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
-                {
-                    tbError.Text = "There appears to already be a Receive thread running";
-                });
+                await ErrorMessage("There appears to already be a Receive thread running");
                 return;
             } else
             {
@@ -750,7 +744,7 @@ namespace Uniden_Remote_Head
                                 if (receivedLine.IndexOf("STS") == 0)
                                 {
                                     string[] splitString = receivedLine.Split(',');
-                                    if(splitString.Count() < 2)
+                                    if (splitString.Count() < 2)
                                     {
                                         continue;
                                     }
@@ -758,7 +752,7 @@ namespace Uniden_Remote_Head
 
                                     for (int lineNum = 0; lineNum < 6; lineNum++)
                                     {
-                                        TextBlock textBox = (TextBlock) this.FindName("tbLine" + (lineNum + 1));
+                                        TextBlock textBox = (TextBlock)this.FindName("tbLine" + (lineNum + 1));
                                         if (numLines > lineNum)
                                         {
                                             textBox.Visibility = Visibility.Visible;
@@ -780,10 +774,10 @@ namespace Uniden_Remote_Head
                                         }
                                     }
 
-                                    for(int lineNum = 0; lineNum < numLines; lineNum++)
+                                    for (int lineNum = 0; lineNum < numLines; lineNum++)
                                     {
                                         TextBlock textBox = (TextBlock)this.FindName("tbLine" + (lineNum + 1));
-                                        if((2 + lineNum * 2) >= splitString.Length)
+                                        if ((2 + lineNum * 2) >= splitString.Length)
                                         {
                                             break;
                                         }
@@ -801,7 +795,7 @@ namespace Uniden_Remote_Head
                                     Int32.TryParse(splitString[splitString.Length - 1].TrimEnd('\r'), out backLight);
                                 }
                             }
-                            if(clearString)
+                            if (clearString)
                                 tempString = String.Empty;
                             clearString = true;
                         }
@@ -812,10 +806,10 @@ namespace Uniden_Remote_Head
                 }
                 catch (Exception ex)
                 {
+                    await ErrorMessage(ex.Message);
                     await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
                     {
-                        tbError.Text = ex.Message;
-                        if(ex.Message.IndexOf("connection was aborted") != -1)
+                        if (ex.Message.IndexOf("connection was aborted") != -1)
                         {
                             if (reader != null)
                             {
@@ -878,10 +872,7 @@ namespace Uniden_Remote_Head
                     }
                     catch (Exception ex)
                     {
-                        await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
-                        {
-                            tbError.Text = ex.Message;
-                        });
+                        await ErrorMessage(ex.Message);
                         if (writer != null)
                         {
                             writer.DetachStream();
@@ -893,32 +884,6 @@ namespace Uniden_Remote_Head
                 {
                     try
                     {
-                        if (!connected)  // if we're not connected, none of this is going to work, so there's no point in trying it yet. Lets give a different message though.
-                        {
-                            await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
-                            {
-                                string temp = "";
-                                switch (tbLine3.Text.Length)
-                                {
-                                    case (15):
-                                        temp = "Searching BT.";
-                                        break;
-                                    case (13):
-                                        temp = "Searching BT..";
-                                        break;
-                                    case (14):
-                                        temp = "Searching BT...";
-                                        break;
-                                    default:
-                                        temp = "Searching BT.";
-                                        break;
-                                }
-                                tbLine3.Text = temp;
-                            });
-
-                            return;
-                        }
-
                         if (UpdateSettings)
                         {
                             UpdateSettingsCommunications();
@@ -994,10 +959,7 @@ namespace Uniden_Remote_Head
                     }
                     catch (Exception ex)
                     {
-                        await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
-                        {
-                            tbError.Text = ex.Message;
-                        });
+                        await ErrorMessage(ex.Message);
                     }
                 }, TimeSpan.FromMilliseconds(1000));
 
@@ -1022,12 +984,15 @@ namespace Uniden_Remote_Head
                         // Update UI
                         await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
                         {
-                            tbBatStatus.Text = "Battery Status: " + report.Status.ToString();
-                            tbBatPercent.Text = "Battery Percent: " + percent.ToString() + "%";
-                            tbBatMaxCap.Text = "Battery Design Capacity: " + report.DesignCapacityInMilliwattHours.ToString() + "mWh";
-                            tbBatCurCap.Text = "Battery Max Capacity: " + report.FullChargeCapacityInMilliwattHours.ToString() + "mWh";
-                            tbBatRemainCap.Text = "Battery Remaining Capacity: " + report.RemainingCapacityInMilliwattHours.ToString() + "mWh";
-                            tbBatChargeRate.Text = "Battery Charge Rate: " + report.ChargeRateInMilliwatts.ToString() + "mW";
+                            tbBatStatus.Text = "\uD83D\uDD0B " + percent.ToString() + "% Rate: " +
+                                                report.ChargeRateInMilliwatts.ToString() + "mW Cap: " +
+                                                report.FullChargeCapacityInMilliwattHours.ToString() + "/" +
+                                                report.DesignCapacityInMilliwattHours.ToString() + "mWh";
+                            //tbBatPercent.Text = "Battery Percent: " + percent.ToString() + "%";
+                            //tbBatMaxCap.Text = "Battery Design Capacity: " + report.DesignCapacityInMilliwattHours.ToString() + "mWh";
+                            //tbBatCurCap.Text = "Battery Max Capacity: " + report.FullChargeCapacityInMilliwattHours.ToString() + "mWh";
+                            //tbBatRemainCap.Text = "Battery Remaining Capacity: " + report.RemainingCapacityInMilliwattHours.ToString() + "mWh";
+                            //tbBatChargeRate.Text = "Battery Charge Rate: " + report.ChargeRateInMilliwatts.ToString() + "mW";
                         });
 
                         await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
@@ -1071,19 +1036,13 @@ namespace Uniden_Remote_Head
                     }
                     catch (Exception ex)
                     {
-                        await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
-                        {
-                            tbError.Text = ex.Message;
-                        });
+                        await ErrorMessage(ex.Message);
                     }
                 }, TimeSpan.FromMilliseconds(5000));
             }
             catch (Exception ex)
             {
-                await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
-                {
-                    tbError.Text = ex.Message;
-                });
+                await ErrorMessage(ex.Message);
             }
         }
 
@@ -1091,10 +1050,7 @@ namespace Uniden_Remote_Head
         {
             DeviceInformation device = null;
 
-            await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
-            {
-                tbError.Text = string.Empty;
-            });
+            await ErrorMessage(string.Empty);
 
             try
             {
@@ -1119,10 +1075,7 @@ namespace Uniden_Remote_Head
             }
             catch (Exception ex)
             {
-                await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
-                {
-                    tbError.Text = ex.Message;
-                });
+                await ErrorMessage(ex.Message);
                 connected = false;
             }
 
@@ -1131,7 +1084,7 @@ namespace Uniden_Remote_Head
 
         private void Disconnect()
         {
-            tbError.Text = string.Empty;
+            ErrorMessage(string.Empty);
 
             connectionChange = true;
             connected = false;
@@ -1146,7 +1099,7 @@ namespace Uniden_Remote_Head
             }
             catch (Exception ex)
             {
-                tbError.Text = ex.Message;
+                ErrorMessage(ex.Message);
             }
             connectionChange = false;
         }
@@ -1167,14 +1120,14 @@ namespace Uniden_Remote_Head
 
             if (!int.TryParse(tbInput.Text, out dummy))
             {
-                tbError.Text = "Invalid input";
+                await ErrorMessage("Invalid input");
             }
 
             var noOfCharsSent = await Send(tbInput.Text);
 
             if (noOfCharsSent != 0)
             {
-                tbError.Text = noOfCharsSent.ToString();
+                await ErrorMessage(noOfCharsSent.ToString());
             }
         }
 
@@ -1182,6 +1135,23 @@ namespace Uniden_Remote_Head
         {
             receiveData = true;
             Receive();
+        }
+
+        private async Task ErrorMessage(String message, String method = "")
+        { 
+            await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
+            {
+                tbError2.Text = tbError.Text;
+                tbError3.Text = tbError2.Text;
+                tbError4.Text = tbError3.Text;
+                if (method != "")
+                {
+                    tbError.Text = method + ": " + message;
+                } else
+                {
+                    tbError.Text = message;
+                }
+            });
         }
 
         private void sldrChange(object sender, RangeBaseValueChangedEventArgs e)
@@ -1200,7 +1170,7 @@ namespace Uniden_Remote_Head
             }
             catch (Exception ex)
             {
-                tbError.Text = ex.Message;
+                ErrorMessage(ex.Message);
             }
         }
 
