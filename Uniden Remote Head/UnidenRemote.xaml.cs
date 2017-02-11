@@ -235,20 +235,7 @@ namespace Uniden_Remote_Head
 
         private void btnMute_Click(object sender, RoutedEventArgs e)
         {
-            if (scannerSettings.Scanner.mute) // button has been clicked, if muted we'll unmute, else mute
-            {
-                SendNow("VOL," + scannerSettings.Scanner.volume.ToString());
-                scannerSettings.Scanner.mute = false;
-                UpdateSettings = true;
-                btnMute.BorderBrush = new SolidColorBrush(Colors.DimGray);
-            }
-            else
-            {
-                SendNow("VOL,0");
-                scannerSettings.Scanner.mute = true;
-                UpdateSettings = true;
-                btnMute.BorderBrush = new SolidColorBrush(Colors.Red);
-            }
+            Mute(!scannerSettings.Scanner.mute);
         }
 
         private void btnSquelchUp_Click(object sender, RoutedEventArgs e)
@@ -432,7 +419,7 @@ namespace Uniden_Remote_Head
             }
             catch (Exception ex)
             {
-                await ErrorMessage(ex.Message);
+                await ErrorMessageAsync(ex.Message, "Send Now");
                 if (writer != null)
                 {
                     writer.DetachStream();
@@ -442,7 +429,7 @@ namespace Uniden_Remote_Head
 
         private async Task<uint> Send(string msg)
         {
-            await ErrorMessage(string.Empty);
+            await ErrorMessageAsync(string.Empty);
 
             DataWriter writer = null;
 
@@ -465,7 +452,7 @@ namespace Uniden_Remote_Head
             }
             catch (Exception ex)
             {
-                await ErrorMessage(ex.Message);
+                await ErrorMessageAsync(ex.Message, "Send");
 
                 if (writer != null)
                 {
@@ -481,7 +468,7 @@ namespace Uniden_Remote_Head
             // we want to make sure only 1 receive thread is running
             if (receiveDataThreads > 0)
             {
-                await ErrorMessage("There appears to already be a Receive thread running");
+                await ErrorMessageAsync("There appears to already be a Receive thread running");
                 return;
             } else
             {
@@ -618,14 +605,14 @@ namespace Uniden_Remote_Head
                                     readUTF16.Add(' ');
                                     readUTF16.Add(' ');
                                     readUTF16.Add(' ');
-                                    readUTF16.Add(' ');
+                                    //readUTF16.Add(' ');
                                     break;
                                 case 0xa7:
                                     readUTF16.Add('▂'); // 2 Bars
                                     readUTF16.Add('▃');
                                     readUTF16.Add(' ');
                                     readUTF16.Add(' ');
-                                    readUTF16.Add(' ');
+                                    //readUTF16.Add(' ');
                                     break;
                                 case 0xa8:
                                     readUTF16.Add('▂'); // 3 Bars 1st Char
@@ -806,7 +793,7 @@ namespace Uniden_Remote_Head
                 }
                 catch (Exception ex)
                 {
-                    await ErrorMessage(ex.Message);
+                    await ErrorMessageAsync(ex.Message, "Receive");
                     await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
                     {
                         if (ex.Message.IndexOf("connection was aborted") != -1)
@@ -872,7 +859,7 @@ namespace Uniden_Remote_Head
                     }
                     catch (Exception ex)
                     {
-                        await ErrorMessage(ex.Message);
+                        await ErrorMessageAsync(ex.Message, "100 uSec. Timer");
                         if (writer != null)
                         {
                             writer.DetachStream();
@@ -899,18 +886,12 @@ namespace Uniden_Remote_Head
 
                         if (!scannerStateKnown && failedRead == 0)
                         {
-                            SendNow("SQL," + scannerSettings.Scanner.squelch.ToString());
-                            if (scannerSettings.Scanner.mute)
-                            {
-                                SendNow("VOL,0");
-                                btnMute.BorderBrush = new SolidColorBrush(Colors.Red);
-                            }
-                            else
-                            {
-                                SendNow("VOL," + scannerSettings.Scanner.volume.ToString());
-                                btnMute.BorderBrush = new SolidColorBrush(Colors.DimGray);
-                            }
                             scannerStateKnown = true;
+                            SendNow("SQL," + scannerSettings.Scanner.squelch.ToString());
+                            await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
+                            {
+                                Mute(scannerSettings.Scanner.mute);
+                            });
                         }
 
                         if (failedRead == failedReadMax)
@@ -959,7 +940,7 @@ namespace Uniden_Remote_Head
                     }
                     catch (Exception ex)
                     {
-                        await ErrorMessage(ex.Message);
+                        await ErrorMessageAsync(ex.Message, "1 Sec. Timer");
                     }
                 }, TimeSpan.FromMilliseconds(1000));
 
@@ -985,7 +966,7 @@ namespace Uniden_Remote_Head
                         await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
                         {
                             tbBatStatus.Text = "\uD83D\uDD0B " + percent.ToString() + "% Rate: " +
-                                                report.ChargeRateInMilliwatts.ToString() + "mW Cap: " +
+                                                report.ChargeRateInMilliwatts.ToString() + "mW Life: " +
                                                 report.FullChargeCapacityInMilliwattHours.ToString() + "/" +
                                                 report.DesignCapacityInMilliwattHours.ToString() + "mWh";
                             //tbBatPercent.Text = "Battery Percent: " + percent.ToString() + "%";
@@ -1021,28 +1002,24 @@ namespace Uniden_Remote_Head
                             }
                         });
 
-                        if (ApiInformation.IsTypePresent("Windows.UI.ViewManagement.StatusBar"))
+                        if (ApiInformation.IsTypePresent("Windows.UI.ViewManagement.StatusBar")) // this tests if we're on mobile
                         {
-                            await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
-                            {
-                                ApplicationView view = ApplicationView.GetForCurrentView();
-                                //if (!view.IsFullScreenMode)
-                                {
-                                    btnFunction.Focus(FocusState.Pointer);
-                                    tbError.Text = view.IsFullScreen.ToString();
-                                }
-                            });
+                            //await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
+                            //{
+                            //    // this is here to try and hide the task bar on mobile
+                            //    ApplicationView view = ApplicationView.GetForCurrentView();
+                            //});
                         }
                     }
                     catch (Exception ex)
                     {
-                        await ErrorMessage(ex.Message);
+                        await ErrorMessageAsync(ex.Message, "5 Sec. Timer");
                     }
                 }, TimeSpan.FromMilliseconds(5000));
             }
             catch (Exception ex)
             {
-                await ErrorMessage(ex.Message);
+                await ErrorMessageAsync(ex.Message, "Timers");
             }
         }
 
@@ -1050,7 +1027,7 @@ namespace Uniden_Remote_Head
         {
             DeviceInformation device = null;
 
-            await ErrorMessage(string.Empty);
+            await ErrorMessageAsync(string.Empty);
 
             try
             {
@@ -1075,7 +1052,7 @@ namespace Uniden_Remote_Head
             }
             catch (Exception ex)
             {
-                await ErrorMessage(ex.Message);
+                await ErrorMessageAsync(ex.Message, "Connect");
                 connected = false;
             }
 
@@ -1099,7 +1076,7 @@ namespace Uniden_Remote_Head
             }
             catch (Exception ex)
             {
-                ErrorMessage(ex.Message);
+                ErrorMessage(ex.Message, "Disconnect");
             }
             connectionChange = false;
         }
@@ -1120,14 +1097,14 @@ namespace Uniden_Remote_Head
 
             if (!int.TryParse(tbInput.Text, out dummy))
             {
-                await ErrorMessage("Invalid input");
+                await ErrorMessageAsync("Invalid input", "Click Send");
             }
 
             var noOfCharsSent = await Send(tbInput.Text);
 
             if (noOfCharsSent != 0)
             {
-                await ErrorMessage(noOfCharsSent.ToString());
+                await ErrorMessageAsync(noOfCharsSent.ToString(), "Num Char Sent");
             }
         }
 
@@ -1137,20 +1114,43 @@ namespace Uniden_Remote_Head
             Receive();
         }
 
-        private async Task ErrorMessage(String message, String method = "")
+        private void Mute(Boolean mute)
+        {
+            scannerSettings.Scanner.mute = mute;
+            UpdateSettings = true;
+
+            if (mute)
+            {
+                SendNow("VOL," + scannerSettings.Scanner.volume.ToString());
+                btnMute.BorderBrush = new SolidColorBrush(Colors.DimGray);
+            }
+            else
+            {
+                SendNow("VOL,0");
+                btnMute.BorderBrush = new SolidColorBrush(Colors.Red);
+            }
+        }
+
+        private void ErrorMessage(String message, String method = "")
+        {
+            tbError2.Text = tbError.Text;
+            tbError3.Text = tbError2.Text;
+            tbError4.Text = tbError3.Text;
+            if (method != "")
+            {
+                tbError.Text = method + ": " + message;
+            }
+            else
+            {
+                tbError.Text = message;
+            }
+        }
+
+        private async Task ErrorMessageAsync(String message, String method = "")
         { 
             await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
             {
-                tbError2.Text = tbError.Text;
-                tbError3.Text = tbError2.Text;
-                tbError4.Text = tbError3.Text;
-                if (method != "")
-                {
-                    tbError.Text = method + ": " + message;
-                } else
-                {
-                    tbError.Text = message;
-                }
+                ErrorMessage(message, method);
             });
         }
 
@@ -1170,7 +1170,7 @@ namespace Uniden_Remote_Head
             }
             catch (Exception ex)
             {
-                ErrorMessage(ex.Message);
+                ErrorMessage(ex.Message, "sldrChange");
             }
         }
 

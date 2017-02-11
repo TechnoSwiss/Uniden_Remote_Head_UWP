@@ -89,16 +89,16 @@
                         </Grid>
                         <TextBlock Name="tbError"
                             TextWrapping="Wrap"
-                            FontSize="20" Foreground="White" Height="55" Canvas.ZIndex="-3" />
+                            FontSize="20" Foreground="White" Height="79" Canvas.ZIndex="-3" />
                         <TextBlock Name="tbError2"
                             TextWrapping="Wrap"
-                            FontSize="20" Foreground="White" Height="55" Canvas.ZIndex="-3" />
+                            FontSize="20" Foreground="White" Height="79" Canvas.ZIndex="-3" />
                         <TextBlock Name="tbError3"
                             TextWrapping="Wrap"
-                            FontSize="20" Foreground="White" Height="55" Canvas.ZIndex="-3" />
+                            FontSize="20" Foreground="White" Height="79" Canvas.ZIndex="-3" />
                         <TextBlock Name="tbError4"
                             TextWrapping="Wrap"
-                            FontSize="20" Foreground="White" Height="55" Canvas.ZIndex="-3" />
+                            FontSize="20" Foreground="White" Height="79" Canvas.ZIndex="-3" />
                     </StackPanel>
                 </ScrollViewer>
             </SplitView.Pane>
