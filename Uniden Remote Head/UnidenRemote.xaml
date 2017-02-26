@@ -87,6 +87,7 @@
                             <TextBlock Text="Blue" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                             <Slider x:Name="sldrBlue" Grid.Column="1" Grid.Row="2" Width="200" Maximum="255" ValueChanged="sldrChange"/>
                         </Grid>
+                        <CheckBox x:Name="chkBluetoothScreen" Content="Bluetooth Keeps Screen Unlocked" HorizontalAlignment="Center" Checked="chkBluetoothScreen_Checked" Unchecked="chkBluetoothScreen_Unchecked" />
                         <TextBlock Name="tbError"
                             TextWrapping="Wrap"
                             FontSize="20" Foreground="White" Height="79" Canvas.ZIndex="-3" />

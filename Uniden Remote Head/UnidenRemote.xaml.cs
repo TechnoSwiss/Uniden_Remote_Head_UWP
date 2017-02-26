@@ -62,6 +62,7 @@ namespace Uniden_Remote_Head
             public int squelch = 14;
             public Boolean mute = false;
             public int backlight = 0;
+            public Boolean btscreenstay = false;
         }
 
         public class Theme
@@ -139,6 +140,7 @@ namespace Uniden_Remote_Head
                 compositeScanner["squelch"] = scannerSettings.Scanner.squelch;
                 compositeScanner["mute"] = scannerSettings.Scanner.mute;
                 compositeScanner["backlight"] = scannerSettings.Scanner.backlight;
+                compositeScanner["btscreenstay"] = scannerSettings.Scanner.btscreenstay;
 
                 localSettings.Values["scannerSettings"] = compositeScanner;
             }
@@ -148,7 +150,9 @@ namespace Uniden_Remote_Head
                 scannerSettings.Scanner.squelch = (int)compositeScanner["squelch"];
                 scannerSettings.Scanner.mute = (Boolean)compositeScanner["mute"];
                 scannerSettings.Scanner.backlight = (int)compositeScanner["backlight"];
+                scannerSettings.Scanner.btscreenstay = (Boolean)compositeScanner["btscreenstay"];
             }
+            chkBluetoothScreen.IsChecked = scannerSettings.Scanner.btscreenstay;
 
             Windows.Storage.ApplicationDataCompositeValue compositeTheme = (Windows.Storage.ApplicationDataCompositeValue)localSettings.Values["themeSettings"];
             if (compositeTheme == null)
@@ -193,6 +197,7 @@ namespace Uniden_Remote_Head
             compositeScanner["squelch"] = scannerSettings.Scanner.squelch;
             compositeScanner["mute"] = scannerSettings.Scanner.mute;
             compositeScanner["backlight"] = scannerSettings.Scanner.backlight;
+            compositeScanner["btscreenstay"] = scannerSettings.Scanner.btscreenstay;
 
             localSettings.Values["scannerSettings"] = compositeScanner;
         }
@@ -984,7 +989,7 @@ namespace Uniden_Remote_Head
                             }
                             // if battery is not present and we're still running, we have to assume that we're on AC power
                             // or if the charge rate is any non-negative number, we can assume we have a battery, and we're on AC power
-                            if (report.Status == Windows.System.Power.BatteryStatus.NotPresent || report.ChargeRateInMilliwatts >= 0)
+                            if (report.Status == Windows.System.Power.BatteryStatus.NotPresent || report.ChargeRateInMilliwatts >= 0 || (scannerSettings.Scanner.btscreenstay && connected))
                             {
                                 if (drCounter == 0)
                                 {
@@ -994,10 +999,13 @@ namespace Uniden_Remote_Head
                             }
                             else
                             {
-                                while (drCounter > 0)
+                                if (!(scannerSettings.Scanner.btscreenstay && connected))
                                 {
-                                    displayRequest.RequestRelease();
-                                    drCounter--;
+                                    while (drCounter > 0)
+                                    {
+                                        displayRequest.RequestRelease();
+                                        drCounter--;
+                                    }
                                 }
                             }
                         });
@@ -1174,5 +1182,16 @@ namespace Uniden_Remote_Head
             }
         }
 
+        private void chkBluetoothScreen_Checked(object sender, RoutedEventArgs e)
+        {
+            scannerSettings.Scanner.btscreenstay = true;
+            UpdateSettings = true;
+        }
+
+        private void chkBluetoothScreen_Unchecked(object sender, RoutedEventArgs e)
+        {
+            scannerSettings.Scanner.btscreenstay = false;
+            UpdateSettings = true;
+        }
     }
 }
